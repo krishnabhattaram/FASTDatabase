@@ -1,0 +1,17 @@
+ 
+BatchJob:  lws_stats
+# Printer:  hp317
+# Output:   ColorPostScriptL2
+# PlotsPerPage: 8
+# PageSize:   ASize
+# Orientation:  portrait
+# PageTag:  dbase_test 
+NoPlots:
+IDL: /home/krishnabhattaram/Desktop/SDT_IDL_Files/LWS_Stats_Database_Files/lws_stats_supplement_wrapper.pro
+ 
+DataBaseRequest:
+    Orbits 400 - 13311 / 1
+
+PlotConfigurationDir: /home/krishnabhattaram
+PlotConfigurationFile: lws_stats
+
