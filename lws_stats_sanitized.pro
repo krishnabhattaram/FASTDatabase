@@ -99,7 +99,7 @@ pro lws_stats_sanitized
   fa_fields_dsp,'DspADC_V5-V8', t1=orbit.x[0], t2=orbit.x[-1]
   fa_fields_dsp,'DspMag3ac', t1=orbit.x[0], t2=orbit.x[-1]
   
-  freq=(1+findgen(512))*32768/1024.  ;; TODO: CHECK THIS FREQUENCY!!!!!!!!!!!!!!!!!!!!!!!
+  freq=(1+findgen(512))*32768/1024. 
   
   get_data,'DSP_V5-V8',data=datv
   get_data,'DSP_Mag3a',data=datm
@@ -113,138 +113,6 @@ pro lws_stats_sanitized
   
   _ = store_tplot_cdf('dspV58-sp', data=dspv_av_cleaned, catdesc = 'log((V/m)!U2!N/Hz), spin plane electric field spectral density')
   _ = store_tplot_cdf('dspmag3ac-sp', data=dspm3ac_av, catdesc = 'log(nT!U2!N/Hz), search coil z-axis spectral energy density')
-  
-  options,'dspV58-sp','spec',1
-  options,'dspV58-sp','ylog',1
-  options,'dspV58-sp','zlog',0
-  ;options,'dspV58-sp','zrange',1
-  ;options,'dspv-s','yrange',1
-  ;options,'dspv-s','yrange',[1,10.0]
-  options, 'dspV58-sp', 'x_no_interp', 0
-  options, 'dspV58-sp', 'x_no_interp', 0
-  options,'dspV58-sp','zrange',[-11,-1]
-  options,'dspV58-sp','ztitle','log((V/m)!U2!N/Hz)'
-  options,'dspV58-sp','panel_size',3
-  options,'dspV58-sp','ytitle','DSPV. Freq (Hz)'
-  ;tplot, 'dspV58-sp'
-  
-  eav_time_indices = where(eav_sp.x ge 844891025 and eav_sp.x le 844891200)
-  eav_times = {x: eav_sp.x[eav_time_indices], y: alog10(eav_sp.y[eav_time_indices, *]*1e-6), v: eav_sp.v, spec:1}
-  store_data, 'eav-sp', data=eav_times;{x: eav_sp.x, y: alog10(eav_sp.y*1e-6), v:eav_sp.v, spec:1}
-  options,'eav-sp','spec',1
-  options,'eav-sp','ylog',1
-  options,'eav-sp','zlog',0
-  options,'eav-sp','zrange',1
-  options,'eav-sp','yrange',1
-  options,'eav-sp','yrange',[1,16000.0]
-  options, 'eav-sp', 'x_no_interp', 0
-  options, 'eav-sp', 'x_no_interp', 0
-  options,'eav-sp','zrange',[-11,-1]
-  options,'eav-sp','ztitle','log((V/m)!U2!N/Hz)'
-  options,'eav-sp','panel_size',3
-  options,'eav-sp','ytitle','EAV. Freq (Hz)'
-  tplot, 'eav-sp'
-  
-  good_eav = where(finite(eav_sp.y[*, -1]), counteav)
-  eav_good = eav_sp.y[good_eav, *]
-  eav_means_good = exp(mean(alog(eav_good), dimension=1, /nan))
-  
-  pdf = histogram(alog(eav_good[*, 24]*1e-6), nbins=100, locations=binvals, /NAN)
-  myplot = barplot(binvals, 1.0*pdf/max(pdf), title='EAV Values at ' + str(eav_sp.v[24]) + ' Hz', xtitle='Value log((V/m)^2/Hz)', ytitle='Frequency', xrange=[-30,2])
-  
-  dspv_time_indices = where(dspv.x ge 844891025 and dspv.x le 844891200)
-  dspv_times = {x: dspv.x[dspv_time_indices], y: dspv.y[dspv_time_indices, *], v: dspv.v}
-  store_data, 'dspv-s', data=dspv_times;dspv
-
-  options,'dspv-s','spec',1
-  options,'dspv-s','ylog',1
-  options,'dspv-s','zlog',0
-  options,'dspv-s','zrange',1
-  options,'dspv-s','yrange',1
-  options,'dspv-s','yrange',[1,16000.0]
-  options, 'dspv-s', 'x_no_interp', 0
-  options, 'dspv-s', 'x_no_interp', 0
-  options,'dspv-s','zrange',[-11,-1]
-  options,'dspv-s','ztitle','log((V/m)!U2!N/Hz)'
-  options,'dspv-s','panel_size',3
-  options,'dspv-s','ytitle','DSPV. Freq (Hz)'
-  tplot, 'dspv-s'
-  
-  p = plot(eav_times.v, 10^mean(eav_times.y, dimension=1, /nan), title = 'EAV SP', xtitle = 'Frequency (Hz)', ytitle = '(V/m)^2/Hz', /xlog, /ylog);, /overplot, color='red')
-  p = plot(dspv_times.v, 10^mean(dspv_times.y, dimension=1, /nan), title = 'Electric Field Spectral Energy Density', xtitle = 'Frequency (Hz)', ytitle = '(V/m)^2/Hz', /xlog, /overplot, /ylog)
-  
-  ;freqs = exp(findgen(10) * (alog(16000) - alog(500))/(10 - 1) + alog(500))
-  
-  ;for i=0,9 do begin
- ind = 31;value_locate(dspv.v, ;freqs[i])
- pdf = histogram(dspv.y[*, ind], nbins=50, locations=binvals, /NAN)
- ;myplot = barplot(binvals, 1.0*pdf/max(pdf), title='DSPV Values at ' + str(dspv.v[ind]) + ' Hz', xtitle='Value log((V/m)^2/Hz)', ytitle='Frequency', xrange=[-30, 2])
- ;endfor
-  
-  ;p = plot(eav_sp.v, mean(eav_good*1e-6, dimension=1, /nan), title = 'EAV SP', xtitle = 'Frequency (Hz)', ytitle = '(V/m)^2/Hz', /xlog, /ylog)
-  ;p = plot(dspv.v, mean(10^dspv.y, dimension=1, /nan), title = 'Electric Field Spectral Energy Density', xtitle = 'Frequency (Hz)', ytitle = '(V/m)^2/Hz', /xlog, /overplot, /ylog)
-  p = plot(eav_sp.v, eav_means_good*1e-6, title = 'EAV SP', xtitle = 'Frequency (Hz)', ytitle = '(V/m)^2/Hz', /xlog, /ylog, /overplot, color='red')
-  p = plot(dspv.v, 10^mean(dspv.y, dimension=1, /nan), title = 'Electric Field Spectral Energy Density', xtitle = 'Frequency (Hz)', ytitle = '(V/m)^2/Hz', /xlog, /overplot, /ylog, color='red')
-  
-  ;magz_sp = get_spectral_transform({x: magdata.time, y: magdata.comp3}, elf_fixed_frequencies, freq_error=1e-2, min_max_freq=2.5, frequency_resolution=0.25)
-  ;magz_sp.y = alog10(magz_sp.y)
-  ;mag3ac_sp = get_spectral_transform(mag3ac, elf_fixed_frequencies, freq_error=1e-2, min_max_freq=2.5, frequency_resolution=0.25)
-  ;mag3ac_sp.y = alog10(mag3ac_sp.y)
-  
-  store_data, 'dspm3ac', data=dspm3ac
-  ;store_data, 'magz_spt', data=magz_sp
-  ;store_data, 'mag3ac_spt', data=mag3ac_sp
-
-  options,'dspm3ac','spec',1
-  options,'dspm3ac','ylog',1
-  options,'dspm3ac','zlog',0
-  ;options,'dspm3ac','yrange',1
-  ;options,'dspm3ac','yrange',[1,1000.0]
-  options,'dspm3ac','zrange',[-14,-10]
-  options,'dspm3ac','ztitle','log(nT!U2!N/Hz)'
-  options,'dspm3ac','panel_size',3
-  options,'dspm3ac','ytitle','B. Freq (Hz)'
-  tplot, 'dspm3ac'
-  
-  store_data, 'dspm3aca', data=dspm3ac_av
-  ;store_data, 'magz_spt', data=magz_sp
-  ;store_data, 'mag3ac_spt', data=mag3ac_sp
-
-  options,'dspm3aca','spec',1
-  options,'dspm3aca','ylog',1
-  options,'dspm3aca','zlog',0
-  ;options,'dspm3aca','yrange',1
-  ;options,'dspm3aca','yrange',[1,1000.0]
-  options,'dspm3aca','zrange',[-14,-10]
-  options,'dspm3aca','ztitle','log(nT!U2!N/Hz)'
-  options,'dspm3aca','panel_size',3
-  options,'dspm3aca','ytitle','B. Freq (Hz)'
-  tplot, 'dspm3aca'
-  
-  ;options,'magz_spt','spec',1
-  ;options,'magz_spt','ylog',1
-  ;options,'magz_spt','zlog',0
-  ;options,'magz_spt','yrange',1
-  ;options,'magz_spt','yrange',[0.1,10.0]
-  ;options,'magz_spt','zrange',[-10,10]
-  ;options,'magz_spt','ztitle','log(nT!U2!N2/Hz)'
-  ;options,'magz_spt','panel_size',3
-  ;options,'magz_spt','ytitle','B. Freq (Hz)'
-  
-  ;options,'mag3ac_spt','spec',1
-  ;options,'mag3ac_spt','ylog',1
-  ;options,'mag3ac_spt','zlog',0
-  ;options,'magz_spt','yrange',1
-  ;options,'magz_spt','yrange',[0.1,10.0]
-  ;options,'magz_spt','zrange',[-10,10]
-  ;options,'mag3ac_spt','ztitle','log(nT!U2!N2/Hz)'
-  ;options,'mag3ac_spt','panel_size',3
-  ;options,'mag3ac_spt','ytitle','B. Freq (Hz)'
-  
-  ;p = plot(magz_sp.v, mean(magz_sp.y, dimension=1, /nan), title = 'MagZ', xtitle = 'Frequency (Hz)', ytitle = '(nT)^2/Hz', /xlog)
-  ;p = plot(mag3ac_sp.v, mean(mag3ac_sp.y, dimension=1, /nan), title = 'Mag3AC', xtitle = 'Frequency (Hz)', ytitle = '(nT)^2/Hz', /xlog)
-  ;p = plot(dspm3ac.v, mean(dspm3ac.y, dimension=1, /nan), title = 'DSPM3AC', xtitle = 'Frequency (Hz)', ytitle = '(nT)^2/Hz', /xlog)
-  
 ;;;;;;
 
 ;;; Averaged 3-Component Magnetic field ;;;
